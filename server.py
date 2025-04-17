@@ -3,48 +3,6 @@ import signal
 import sys
 import random
 
-class Database:
-
-    database = dict()
-
-    def __init__(self):
-        count = 0
-        with open("passwords.txt", "r") as passwordsFile, open("secrets.txt", "r") as secretsFile:
-            for line in passwordsFile:
-                line = line.split()
-                username = line[0]
-                password = line[1]
-                self.database[username] = [password, ""]
-            for line in secretsFile:
-                count = count + 1
-                line = line.split()
-                username = line[0]
-                secret = line[1]
-                if (self.database.get(username) == None):
-                    print("Error: cannot give secret to username that hasn't been created yet")
-                    print("       (username that has no password)")
-                    print(f"""error caused by "{username} {secret}" in secrets file (at line {count})""")
-                    print("Aborting...")
-                    sys.exit(0)
-                self.database[username][1] = secret
-
-    def __str__(self):
-        return self.database.__str__()
-    
-    def checkCredentials(self, username, password):
-        if (self.database.get(username) == None):
-            return False
-        if (self.database[username] == password):
-            return True
-        return False
-
-        
-database = Database()
-print(database)
-
-
-    
-
 # Read a command line argument for the port where the server
 # must run.
 port = 8080
@@ -109,7 +67,44 @@ signal.signal(signal.SIGINT, sigint_handler)
 # TODO: put your application logic here!
 # Read login credentials for all the users
 # Read secret data of all the users
+class Database:
 
+    database = dict()
+
+    def __init__(self):
+        count = 0
+        with open("passwords.txt", "r") as passwordsFile, open("secrets.txt", "r") as secretsFile:
+            for line in passwordsFile:
+                line = line.split()
+                username = line[0]
+                password = line[1]
+                self.database[username] = [password, ""]
+            for line in secretsFile:
+                count = count + 1
+                line = line.split()
+                username = line[0]
+                secret = line[1]
+                if (self.database.get(username) == None):
+                    print("Error: cannot give secret to username that hasn't been created yet")
+                    print("       (username that has no password)")
+                    print(f"""error caused by "{username} {secret}" in secrets file (at line {count})""")
+                    print("Aborting...")
+                    sys.exit(0)
+                self.database[username][1] = secret
+
+    def __str__(self):
+        return self.database.__str__()
+    
+    def checkCredentials(self, username, password):
+        if (self.database.get(username) == None):
+            return False
+        if (self.database[username] == password):
+            return True
+        return False
+
+        
+database = Database()
+print(database)
 
 
 
