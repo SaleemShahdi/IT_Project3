@@ -98,13 +98,41 @@ class Database:
     def checkCredentials(self, username, password):
         if (self.database.get(username) == None):
             return False
-        if (self.database[username] == password):
+        if (self.database[username][0] == password):
             return True
         return False
+
+    def getSecret(self, username):
+        return self.database[username][1]
+
+def parseRequest(request):
+    print("request = " + request)
+    if request == "":
+        return ("", "")
+    request = request.split("&")
+    print("request =", request)
+    if ("username=" in request[0]):
+        usernamePart = request[0]
+        passwordPart = request[1]
+    else:
+        usernamePart = request[1]
+        passwordPart = request[0]
+    print("username part =", usernamePart)
+    print("password part =", passwordPart)
+    usernamePart = usernamePart.split("=")
+    print("username part =", usernamePart)
+    passwordPart = passwordPart.split("=")
+    print("password part =", passwordPart)
+    username = usernamePart[1]
+    print("username =", username)
+    password = passwordPart[1]
+    print("password =", password)
+    return (username, password)
 
         
 database = Database()
 print(database)
+firstTime = True
 
 
 
@@ -123,6 +151,9 @@ while True:
 
     # TODO: Put your application logic here!
     # Parse headers and body and perform various actions
+    
+
+    
 
     # OPTIONAL TODO:
     # Set up the port/hostname for the form's submit URL.
@@ -136,12 +167,23 @@ while True:
     # always send the request to the domain name returned by
     # socket.gethostname().
     submit_hostport = "%s:%d" % (hostname, port)
+    username, password = parseRequest(body)
+    if firstTime == True:
+        html_content_to_send = login_page % submit_hostport
+        firstTime = False
+    elif username == "" and password == "":
+        html_content_to_send = login_page % submit_hostport
+    elif username == "" or password == "" or database.checkCredentials(username, password) == False:
+        html_content_to_send = bad_creds_page % submit_hostport
+    else:
+        html_content_to_send = (success_page % submit_hostport) + database.getSecret(username)
+        
 
     # You need to set the variables:
     # (1) `html_content_to_send` => add the HTML content you'd
     # like to send to the client.
     # Right now, we just send the default login page.
-    html_content_to_send = login_page % submit_hostport
+    #html_content_to_send = login_page % submit_hostport (this line was originally uncommented)
     # But other possibilities exist, including
     # html_content_to_send = (success_page % submit_hostport) + <secret>
     # html_content_to_send = bad_creds_page % submit_hostport
