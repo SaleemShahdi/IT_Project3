@@ -109,6 +109,10 @@ def parseRequest(request):
     print("request = " + request)
     if request == "":
         return ("", "")
+    if request == "action=logout":
+        return ("logout", "logout") # just set username and password to logout if action=logout.
+        # It may have been better to return separate variables for logout but the instructions didn't introduce
+        # logout until after the authentication and cookie steps.
     request = request.split("&")
     print("request =", request)
     if ("username=" in request[0]):
@@ -173,6 +177,8 @@ while True:
         firstTime = False
     elif username == "" and password == "":
         html_content_to_send = login_page % submit_hostport
+    elif username == "logout" and password == "logout":
+        html_content_to_send = logout_page % submit_hostport
     elif username == "" or password == "" or database.checkCredentials(username, password) == False:
         html_content_to_send = bad_creds_page % submit_hostport
     else:
