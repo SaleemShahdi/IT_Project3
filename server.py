@@ -133,9 +133,28 @@ def parseRequest(request):
     print("password =", password)
     return (username, password)
 
+def getCookie(header):
+    if "Cookie" not in header:
+        return ""
+    print(header)
+    header = header.splitlines()
+    print(header)
+    for i in range(0, len(header)):
+        if "Cookie" in header[i]:
+            header = header[i]
+            break
+    print(header)
+    header = header.split("token=")
+    print(header)
+    cookie = header[1]
+    print(cookie)
+    return cookie
+
+
+
         
 database = Database()
-cookies = dict()
+databaseCookies = dict()
 rand_val = -1
 print(database)
 firstTime = True
@@ -174,10 +193,14 @@ while True:
     # socket.gethostname().
     submit_hostport = "%s:%d" % (hostname, port)
     username, password = parseRequest(body)
-    if firstTime == True:
-        html_content_to_send = login_page % submit_hostport
+    cookie = getCookie(headers)
+    print(databaseCookies)
+    if cookie != "" and databaseCookies.get(cookie) != None:
+        html_content_to_send = (success_page % submit_hostport) + database.getSecret(databaseCookies[cookie])
         headers_to_send = ""
-        firstTime = False
+    elif cookie != "" and databaseCookies.get(cookie) == None:
+        html_content_to_send = bad_creds_page % submit_hostport
+        headers_to_send = ""
     elif username == "" and password == "":
         html_content_to_send = login_page % submit_hostport
         headers_to_send = ""
@@ -193,9 +216,11 @@ while True:
             rand_val = int(rand_val)
             rand_val = random.getrandbits(64)
             rand_val = str(rand_val)
-            if rand_val not in cookies.values():
+            print(rand_val)
+            if databaseCookies.get(rand_val) == None:
                 break
-        cookies[username] = rand_val
+        databaseCookies[rand_val] = username
+        print(databaseCookies)
         headers_to_send = "Set-Cookie: token=" + str(rand_val) + "\r\n"
         
 
