@@ -135,6 +135,8 @@ def parseRequest(request):
 
         
 database = Database()
+cookies = dict()
+rand_val = -1
 print(database)
 firstTime = True
 
@@ -174,15 +176,27 @@ while True:
     username, password = parseRequest(body)
     if firstTime == True:
         html_content_to_send = login_page % submit_hostport
+        headers_to_send = ""
         firstTime = False
     elif username == "" and password == "":
         html_content_to_send = login_page % submit_hostport
+        headers_to_send = ""
     elif username == "logout" and password == "logout":
         html_content_to_send = logout_page % submit_hostport
+        headers_to_send = ""
     elif username == "" or password == "" or database.checkCredentials(username, password) == False:
         html_content_to_send = bad_creds_page % submit_hostport
+        headers_to_send = ""
     else:
         html_content_to_send = (success_page % submit_hostport) + database.getSecret(username)
+        while True:
+            rand_val = int(rand_val)
+            rand_val = random.getrandbits(64)
+            rand_val = str(rand_val)
+            if rand_val not in cookies.values():
+                break
+        cookies[username] = rand_val
+        headers_to_send = "Set-Cookie: token=" + str(rand_val) + "\r\n"
         
 
     # You need to set the variables:
@@ -198,7 +212,7 @@ while True:
     # (2) `headers_to_send` => add any additional headers
     # you'd like to send the client?
     # Right now, we don't send any extra headers.
-    headers_to_send = ''
+    # headers_to_send = '' (was originally uncommented)
 
     # Construct and send the final response
     response  = 'HTTP/1.1 200 OK\r\n'
