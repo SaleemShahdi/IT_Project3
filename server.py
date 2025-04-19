@@ -150,6 +150,20 @@ def getCookie(header):
     print(cookie)
     return cookie
 
+def getHost(header):
+    header = header.splitlines()
+    print(header)
+    for i in range(0, len(header)):
+        if "Host:" in header[i]:
+            header = header[i]
+            break
+    print(header)
+    header = header.split("Host: ")
+    print(header)
+    host = header[1]
+    print(host)
+    return host
+
 
 
         
@@ -191,7 +205,8 @@ while True:
     # By default, as set up below, POSTing the form will
     # always send the request to the domain name returned by
     # socket.gethostname().
-    submit_hostport = "%s:%d" % (hostname, port)
+    # submit_hostport = "%s:%d" % (hostname, port) (was originally uncommented)
+    submit_hostport = getHost(headers)
     username, password = parseRequest(body)
     cookie = getCookie(headers)
     print(databaseCookies)
