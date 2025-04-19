@@ -11,7 +11,7 @@ if len(sys.argv) > 1:
 else:
     print("Using default port 8080")
 hostname = socket.gethostname()
-print("Hostname = " + hostname)
+#print("Hostname = " + hostname)
 
 
 # Start a listening server socket on the port
@@ -106,7 +106,7 @@ class Database:
         return self.database[username][1]
 
 def parseRequest(request):
-    print("request = " + request)
+    #print("request = " + request)
     if request == "":
         return ("", "")
     if request == "action=logout":
@@ -114,40 +114,40 @@ def parseRequest(request):
         # It may have been better to return separate variables for logout but the instructions didn't introduce
         # logout until after the authentication and cookie steps.
     request = request.split("&")
-    print("request =", request)
+    #print("request =", request)
     if ("username=" in request[0]):
         usernamePart = request[0]
         passwordPart = request[1]
     else:
         usernamePart = request[1]
         passwordPart = request[0]
-    print("username part =", usernamePart)
-    print("password part =", passwordPart)
+    #print("username part =", usernamePart)
+    #print("password part =", passwordPart)
     usernamePart = usernamePart.split("=")
-    print("username part =", usernamePart)
+    #print("username part =", usernamePart)
     passwordPart = passwordPart.split("=")
-    print("password part =", passwordPart)
+    #print("password part =", passwordPart)
     username = usernamePart[1]
-    print("username =", username)
+    #print("username =", username)
     password = passwordPart[1]
-    print("password =", password)
+    #print("password =", password)
     return (username, password)
 
 def getCookie(header):
     if "Cookie" not in header:
         return ""
-    print(header)
+    #print(header)
     header = header.splitlines()
-    print(header)
+    #print(header)
     for i in range(0, len(header)):
         if "Cookie" in header[i]:
             header = header[i]
             break
-    print(header)
+    #print(header)
     header = header.split("token=")
-    print(header)
+    #print(header)
     cookie = header[1]
-    print(cookie)
+    #print(cookie)
     return cookie
 
 
@@ -156,7 +156,7 @@ def getCookie(header):
 database = Database()
 databaseCookies = dict()
 rand_val = -1
-print(database)
+#print(database)
 firstTime = True
 
 
@@ -164,7 +164,7 @@ firstTime = True
 ### Loop to accept incoming HTTP connections and respond.
 while True:
     client, addr = sock.accept()
-    print(addr) # delete later
+    #print(addr) # delete later
     req = client.recv(1024)
 
     # Let's pick the headers and entity body apart
@@ -194,7 +194,7 @@ while True:
     submit_hostport = "%s:%d" % (hostname, port)
     username, password = parseRequest(body)
     cookie = getCookie(headers)
-    print(databaseCookies)
+    #print(databaseCookies)
     if cookie != "" and username == "logout" and password == "logout":
         html_content_to_send = logout_page % submit_hostport
         headers_to_send = f"Set-Cookie: token={cookie}; expires=Thu, 01 Jan 1970 00:00:00 GMT\r\n"
@@ -220,11 +220,11 @@ while True:
             rand_val = int(rand_val)
             rand_val = random.getrandbits(64)
             rand_val = str(rand_val)
-            print(rand_val)
+            #print(rand_val)
             if databaseCookies.get(rand_val) == None:
                 break
         databaseCookies[rand_val] = username
-        print(databaseCookies)
+        #print(databaseCookies)
         headers_to_send = "Set-Cookie: token=" + str(rand_val) + "\r\n"
         
 
