@@ -195,7 +195,11 @@ while True:
     username, password = parseRequest(body)
     cookie = getCookie(headers)
     print(databaseCookies)
-    if cookie != "" and databaseCookies.get(cookie) != None:
+    if cookie != "" and username == "logout" and password == "logout":
+        html_content_to_send = logout_page % submit_hostport
+        headers_to_send = f"Set-Cookie: token={cookie}; expires=Thu, 01 Jan 1970 00:00:00 GMT\r\n"
+        del databaseCookies[cookie]
+    elif cookie != "" and databaseCookies.get(cookie) != None:
         html_content_to_send = (success_page % submit_hostport) + database.getSecret(databaseCookies[cookie])
         headers_to_send = ""
     elif cookie != "" and databaseCookies.get(cookie) == None:
